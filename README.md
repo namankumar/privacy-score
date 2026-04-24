@@ -2,6 +2,10 @@
 
 Privacy Score tells you what your wallet reveals — before someone else figures it out. Paste an Ethereum mainnet address, get a privacy score from 0 to 100, a breakdown by category, and a plain-English explanation of what's exposed and how to fix it.
 
+## Why this exists
+
+Every blockchain analytics tool is built for the investigator, the entity trying to learn about a wallet. The wallet owner has no equivalent tool. No way to know what an investigator can see, what they'd conclude, or how to reduce exposure. We built for defense instead of surveillance.
+
 ## How it works
 
 Six scoring categories, each computed independently and weighted into a composite score:
