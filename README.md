@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# privacy-score
 
-## Getting Started
+Privacy Score tells you what your wallet reveals — before someone else figures it out. Paste an Ethereum mainnet address, get a privacy score from 0 to 100, a breakdown by category, and a plain-English explanation of what's exposed and how to fix it.
 
-First, run the development server:
+## How it works
+
+Six scoring categories, each computed independently and weighted into a composite score:
+
+| Category | What it checks |
+|---|---|
+| Address hygiene | Reuse patterns, round-amount sends, change address behavior |
+| Entity exposure | Interactions with labeled exchanges, custodians, known entities |
+| Identity leaks | ENS names, NFT mints, on-chain governance votes, doxxing events |
+| Timing patterns | Predictable transaction timing, timezone inference |
+| Cross-chain linkability | Bridge usage that links identities across chains |
+| Protocol surface | DeFi interactions, approval patterns, mixer/privacy tool usage |
+
+After scoring, Claude generates a 2-3 paragraph plain-English explanation specific to that wallet: an analysis of what that address's actual behavior reveals.
+
+## Stack
+
+- **Next.js 16:** App Router, API routes
+- **viem:** Ethereum data fetching and ENS resolution
+- **Anthropic SDK:** Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) for AI explanation
+- **Vercel OG:** shareable score cards
+- **Tailwind CSS v4**
+
+## Run locally
+
+```bash
+npm install
+```
+
+Create `.env.local`:
+
+```bash
+ANTHROPIC_API_KEY=your_key
+ETHERSCAN_API_KEY=your_key    # free at etherscan.io
+```
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+One-click deploy to Vercel. Set `ANTHROPIC_API_KEY` and `ETHERSCAN_API_KEY` in environment variables.
 
-## Learn More
+## Rate limiting
 
-To learn more about Next.js, take a look at the following resources:
+20 scans per IP per 24 hours (in-memory). Swap for Redis in production.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tests
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm test
+```
 
-## Deploy on Vercel
+## What's next
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Right now scoring is deterministic: fixed data fetches, fixed weights, Claude only writes the explanation. The next version makes Claude the investigator. It gets the address and a set of tools, decides what to look up based on what it finds, and returns a score with reasoning. Adaptive depth instead of a fixed pipeline.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Chain expansion.** The scoring categories are chain-agnostic; the data layer isn't. EVM chains (Base, Arbitrum, Polygon) are a low-lift extension — swap the Alchemy endpoint and update the known-entity address list. Solana is a larger effort: the data layer (Helius/Solana RPC, SPL token accounts), scoring logic (program ID lookups instead of calldata analysis), and entity database all need Solana-specific implementations.
