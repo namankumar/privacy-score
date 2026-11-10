@@ -1,12 +1,12 @@
 # privacy-score
 
-Privacy Score is an Ethereum-mainnet prototype for inspecting on-chain signals associated with a wallet address. Paste an address or ENS name to get a 0–100 heuristic score, a category breakdown, and a plain-English explanation of the signals the scorer found.
+Paste an Ethereum address or ENS name to see a privacy score, the signals behind it, and an explanation of what those signals mean. This is a prototype for making wallet exposure easier to inspect, not a guarantee of anonymity.
 
 The score follows explicit rules applied to the data returned by its providers. It describes those signals rather than guaranteeing a wallet’s privacy.
 
 ## Why this exists
 
-Much blockchain analytics work is optimized for investigation. This prototype explores the inverse: giving a wallet owner a transparent view of a defined set of on-chain signals and the rules used to score them.
+A wallet owner should be able to see what their public activity reveals. This prototype puts the scoring rules and their limits next to the result, rather than treating a number as the whole answer.
 
 ## How it works
 
@@ -41,7 +41,7 @@ The score is computed before model use. Claude then turns the scoring output int
 ## Run locally
 
 ```bash
-npm install
+npm ci
 ```
 
 Create `.env.local`:
@@ -74,11 +74,11 @@ The route uses a process-local limit of 20 scans per IP per 24 hours. It is not 
 npm test
 ```
 
-## What's next
+## Current limits
 
-Right now scoring is deterministic: fixed data fetches, fixed weights, Claude only writes the explanation. The next version makes Claude the investigator. It gets the address and a set of tools, decides what to look up based on what it finds, and returns a score with reasoning. Adaptive depth instead of a fixed pipeline.
+The fixed rules only cover the data the providers return. The model writes the explanation; it does not independently investigate the wallet. Other chains and adaptive investigation are not implemented by this pipeline.
 
-**Chain expansion.** The scoring categories are chain-agnostic; the data layer isn't. EVM chains (Base, Arbitrum, Polygon) are a low-lift extension — swap the Alchemy endpoint and update the known-entity address list. Solana is a larger effort: the data layer (Helius/Solana RPC, SPL token accounts), scoring logic (program ID lookups instead of calldata analysis), and entity database all need Solana-specific implementations.
+Running a scan contacts external providers and may incur charges. Use a public test address first. This documentation edit did not verify live provider responses or rerun the test suite.
 
 ## Provenance and reuse
 
